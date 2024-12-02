@@ -3,12 +3,34 @@
  */
 package org.example;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class App extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Create UI components
+        Label label = new Label("Hello World!");
+        Button button = new Button("Click Me");
+        button.setOnAction(e -> label.setText("Button Clicked!"));
+
+        // Layout container
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(label, button);
+
+        // Scene and stage setup
+        Scene scene = new Scene(layout, 300, 200);
+        primaryStage.setTitle("JavaFX Application");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        launch(args); // Start JavaFX application
     }
 }
