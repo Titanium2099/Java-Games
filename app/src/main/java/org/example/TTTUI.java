@@ -13,7 +13,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-
 // Tic Tac Toe UI
 public class TTTUI extends VBox {
 
@@ -28,7 +27,25 @@ public class TTTUI extends VBox {
 
     private int winner = 0;
 
-    public TTTUI() {
+    /*
+     * gameModes are as follows:
+     * 0: Player vs Player
+     * 1: Player vs AI (Easy)
+     * 2: Player vs AI (Medium)
+     * 3: Player vs AI (Hard)
+     * 4: Player vs AI (Impossible)
+     */
+    private int gameMode;
+
+    //definitions for the max depth of the minimax algorithm for each difficulty
+    private static final int EASY_MAX_DEPTH = 1;
+    private static final int MEDIUM_MAX_DEPTH = 3;
+    private static final int HARD_MAX_DEPTH = 5;
+    private static final int IMPOSSIBLE_MAX_DEPTH = 100;
+
+    public TTTUI(int passedGameMode) {
+        gameMode = passedGameMode;
+
         board = new Button[3][3];
         boardState = new int[3][3];
         xTurn = true;
@@ -82,6 +99,10 @@ public class TTTUI extends VBox {
         if (winner != 0) {
             return;
         }
+        //check if the button should even respond to a click (AI's turn)
+        if (gameMode != 0 && !xTurn) {
+            return;
+        }
 
         int[] indices = (int[]) button.getUserData();
         int x = indices[0];
@@ -99,7 +120,7 @@ public class TTTUI extends VBox {
         button.setGraphic(imageView);
         xTurn = !xTurn;
 
-        status.setText(xTurn ? "Player 1's turn" : "Player 2's turn");
+        status.setText(xTurn ? "Player 1's turn" : (gameMode == 0 ? "Player 2's turn" : "AI's turn"));
 
         winner = checkWin();
         if (winner != 0) {
@@ -114,10 +135,13 @@ public class TTTUI extends VBox {
             } else {
                 winnerText = "It's a Draw!";
             }
-            TPopup(winnerText,"Go Back", () -> {
+            TPopup(winnerText, "Go Back", () -> {
                 // Callback action, e.g., return to main menu
                 App.scene.setRoot(App.mainMenu);
             });
+        }
+        if(gameMode != 0 && !xTurn){
+            AI_communicator(); //call the AI
         }
     }
 
@@ -179,7 +203,7 @@ public class TTTUI extends VBox {
         Rectangle background = new Rectangle(App.scene.getWidth(), App.scene.getHeight());
         background.setStyle("-fx-fill: rgba(0, 0, 0, 0.5);");
         background.setManaged(false);
-        Rectangle textBox = new Rectangle(250,150);
+        Rectangle textBox = new Rectangle(250, 150);
         textBox.setArcWidth(30);
         textBox.setArcHeight(30);
         textBox.setStyle("-fx-fill: white;");
@@ -187,7 +211,7 @@ public class TTTUI extends VBox {
         MainMenuButton mainMenuButton = new MainMenuButton(buttonText);
         mainMenuButton.setStyle("-fx-padding: 10;");
         mainMenuButton.setOnAction(event -> onButtonClick.run());
-    
+
         VBox popupContent = new VBox(20);
         popupContent.setAlignment(Pos.CENTER);
         popupContent.getChildren().addAll(winMessage, mainMenuButton);
@@ -199,11 +223,40 @@ public class TTTUI extends VBox {
         popup.setLayoutX((App.scene.getWidth() / 2));
         popup.setLayoutY((App.scene.getHeight() / 2));
         this.getChildren().addAll(background, popup);
-    
+
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), background);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
         fadeIn.setCycleCount(1);
         fadeIn.play();
+    }
+
+    private void AI_communicator(){
+        int[] returned = Minimax_Algorithm.findBestMove(boardState, gameMode == 1 ? EASY_MAX_DEPTH : gameMode == 2 ? MEDIUM_MAX_DEPTH : gameMode == 3 ? HARD_MAX_DEPTH : IMPOSSIBLE_MAX_DEPTH);
+        boardState[returned[0]][returned[1]] = 2;
+        ImageView imageView = new ImageView(oImage);
+        imageView.setFitWidth(60);
+        imageView.setFitHeight(60);
+        board[returned[0]][returned[1]].setGraphic(imageView);
+        xTurn = true;
+        status.setText("Player 1's turn");
+        winner = checkWin();
+        if (winner != 0) {
+            System.out.println("Player " + winner + " wins!");
+            addConfetti();
+            System.out.println("Player " + winner + " wins!");
+            String winnerText;
+            if (winner == 1) {
+                winnerText = "Player 1 Wins!";
+            } else if (winner == 2) {
+                winnerText = "Player 2 Wins!";
+            } else {
+                winnerText = "It's a Draw!";
+            }
+            TPopup(winnerText, "Go Back", () -> {
+                // Callback action, e.g., return to main menu
+                App.scene.setRoot(App.mainMenu);
+            });
+        }
     }
 }

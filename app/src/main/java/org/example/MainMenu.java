@@ -42,9 +42,25 @@ public class MainMenu extends VBox {
                 exitButton.setGraphic(backIconView);
                 this.getChildren().addAll(AIButton, twoPlayerButton, exitButton);
             });
+            easyButton.setOnAction(e2 -> {
+                TTTUI tttui = new TTTUI(1);
+                App.scene.setRoot(tttui);
+            });
+            mediumButton.setOnAction(e2 -> {
+                TTTUI tttui = new TTTUI(2);
+                App.scene.setRoot(tttui);
+            });
+            hardButton.setOnAction(e2 -> {
+                TTTUI tttui = new TTTUI(3);
+                App.scene.setRoot(tttui);
+            });
+            impossibleButton.setOnAction(e2 -> {
+                TTTUI tttui = new TTTUI(4);
+                App.scene.setRoot(tttui);
+            });
         });
         twoPlayerButton.setOnAction(e -> {
-            TTTUI tttui = new TTTUI();
+            TTTUI tttui = new TTTUI(0);
             App.scene.setRoot(tttui);
         });
         exitButton.setOnAction(e -> System.exit(0));
