@@ -1,8 +1,6 @@
 package org.example;
 
-import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 public class MainMenu extends VBox {
 
     public MainMenu() {
@@ -33,9 +31,7 @@ public class MainMenu extends VBox {
         });
         twoPlayerButton.setOnAction(e -> {
             TTTUI tttui = new TTTUI();
-            Scene gameScene = new Scene(tttui, 1120, 630);
-            Stage stage = (Stage) this.getScene().getWindow();
-            stage.setScene(gameScene);
+            App.scene.setRoot(tttui);
         });
         exitButton.setOnAction(e -> System.exit(0));
     }

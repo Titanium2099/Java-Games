@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
+    public static Scene scene; // static so it can be accessed from other classes
     @Override
     public void start(Stage primaryStage) {
         URL imageResource = App.class.getClassLoader().getResource("assets/icon-512.png");
@@ -40,7 +41,7 @@ public class App extends Application {
 
         MainMenu mainMenu = new MainMenu();
 
-        Scene scene = new Scene(mainMenu, 1120, 630);
+        scene = new Scene(mainMenu, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
