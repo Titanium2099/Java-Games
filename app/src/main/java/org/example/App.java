@@ -9,10 +9,7 @@ import java.net.URL;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 
@@ -20,14 +17,14 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        URL imageResource = App.class.getClassLoader().getResource("icon-512.png");
+        URL imageResource = App.class.getClassLoader().getResource("assets/icon-512.png");
         if (imageResource == null) {
             System.out.println("Icon resource not found!");
             return;
         }
 
         // Set the stage icon
-        primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
+        primaryStage.getIcons().add(new Image("file:src/main/resources/assets/512x512.png")); // Replace with your icon path
 
 
         // Configure the Taskbar icon (requires Java 9+)
@@ -41,21 +38,14 @@ public class App extends Application {
             System.out.println("There was a security exception for Taskbar.setIconImage");
         }
 
-        // Create UI components
-        Label label = new Label("Hello World!");
-        Button button = new Button("Click Me");
-        button.setOnAction(e -> label.setText("Button Clicked!"));
+        MainMenu mainMenu = new MainMenu();
 
-        // Layout container
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(label, button);
-
-        // Scene and stage setup
-        Scene scene = new Scene(layout, 1120, 630);
-        primaryStage.setTitle("Tic Tac Toe");
-        primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
+        Scene scene = new Scene(mainMenu, 1120, 630);
+        scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
+
+
     }
 
     public static void main(String[] args) {

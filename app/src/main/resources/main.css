@@ -1,0 +1,20 @@
+.button{
+    -fx-background-color: #0480A9;
+    -fx-width: 300px;
+    -fx-height: 60px;
+    -fx-border-radius: 30px;
+    -fx-display: flex;
+    -fx-justify-content: center;
+    -fx-align-content: center;
+    -fx-user-select: none;
+}
+.button-hovered{
+    -fx-background-color: #005f7b;
+    -fx-width: 300px;
+    -fx-height: 60px;
+    -fx-border-radius: 30px;
+    -fx-display: flex;
+    -fx-justify-content: center;
+    -fx-align-content: center;
+    -fx-user-select: none;
+}
