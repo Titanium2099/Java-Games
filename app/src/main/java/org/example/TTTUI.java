@@ -13,6 +13,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+
 // Tic Tac Toe UI
 public class TTTUI extends VBox {
 
@@ -95,7 +96,19 @@ public class TTTUI extends VBox {
         if (winner != 0) {
             System.out.println("Player " + winner + " wins!");
             addConfetti();
-            addWinPopup(winner);
+            System.out.println("Player " + winner + " wins!");
+            String winnerText;
+            if (winner == 1) {
+                winnerText = "Player 1 Wins!";
+            } else if (winner == 2) {
+                winnerText = "Player 2 Wins!";
+            } else {
+                winnerText = "It's a Draw!";
+            }
+            TPopup(winnerText,"Go Back", () -> {
+                // Callback action, e.g., return to main menu
+                App.scene.setRoot(App.mainMenu);
+            });
         }
     }
 
@@ -153,7 +166,7 @@ public class TTTUI extends VBox {
         pause.play();
     }
 
-    private void addWinPopup(int winner) {
+    private void TPopup(String text, String buttonText, Runnable onButtonClick) {
         Rectangle background = new Rectangle(App.scene.getWidth(), App.scene.getHeight());
         background.setStyle("-fx-fill: rgba(0, 0, 0, 0.5);");
         background.setManaged(false);
@@ -161,19 +174,10 @@ public class TTTUI extends VBox {
         textBox.setArcWidth(30);
         textBox.setArcHeight(30);
         textBox.setStyle("-fx-fill: white;");
-        StyledText winMessage;
-        if (winner == 1) {
-            winMessage = new StyledText("Player 1 Wins!");
-        } else if (winner == 2) {
-            winMessage = new StyledText("Player 2 Wins!");
-        } else {
-            winMessage = new StyledText("It's a Draw!");
-        }
-        MainMenuButton mainMenuButton = new MainMenuButton("Go Back");
+        StyledText winMessage = new StyledText(text);
+        MainMenuButton mainMenuButton = new MainMenuButton(buttonText);
         mainMenuButton.setStyle("-fx-padding: 10;");
-        mainMenuButton.setOnAction(event -> {
-            App.scene.setRoot(App.mainMenu);
-        });
+        mainMenuButton.setOnAction(event -> onButtonClick.run());
     
         VBox popupContent = new VBox(20);
         popupContent.setAlignment(Pos.CENTER);
