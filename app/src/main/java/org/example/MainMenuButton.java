@@ -2,6 +2,7 @@ package org.example;
 
 import javafx.scene.control.Button;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class MainMenuButton extends Button {
 
@@ -16,12 +17,15 @@ public class MainMenuButton extends Button {
         this.setPrefHeight(60);
         
         //load custom font
-        Font quicksand = Font.loadFont(getClass().getResource("/fonts/quicksand.ttf").toExternalForm(), 18);
+        Font quicksand = Font.loadFont(getClass().getResource("/fonts/Quicksand-Bold.ttf").toExternalForm(), 18);
         if (quicksand != null) {
-            this.setFont(quicksand); // Apply font to the button
+            this.setFont(quicksand); // Apply font
         } else {
             System.out.println("Font could not be loaded!");
+            // Fallback to Arial
+            this.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         }
+        
         //weird fix to border radius glitch
         this.heightProperty().addListener((obs, oldHeight, newHeight) -> {
             double radius = newHeight.doubleValue() / 2;

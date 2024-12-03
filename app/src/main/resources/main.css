@@ -6,7 +6,10 @@
     -fx-padding: 10px 20px;
     -fx-alignment: center;
     -fx-user-select: none;
+    -fx-font-weight: bold;
+    -fx-font-family: "Quicksand";
 }
+
 
 /* Hovered button style (overrides .button styles) */
 .button-hovered {
