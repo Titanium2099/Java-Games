@@ -1,20 +1,14 @@
-.button{
+/* Default button style */
+.button {
     -fx-background-color: #0480A9;
-    -fx-width: 300px;
-    -fx-height: 60px;
-    -fx-border-radius: 30px;
-    -fx-display: flex;
-    -fx-justify-content: center;
-    -fx-align-content: center;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 10px 20px;
+    -fx-alignment: center;
     -fx-user-select: none;
 }
-.button-hovered{
+
+/* Hovered button style (overrides .button styles) */
+.button-hovered {
     -fx-background-color: #005f7b;
-    -fx-width: 300px;
-    -fx-height: 60px;
-    -fx-border-radius: 30px;
-    -fx-display: flex;
-    -fx-justify-content: center;
-    -fx-align-content: center;
-    -fx-user-select: none;
 }
