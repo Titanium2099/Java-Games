@@ -113,14 +113,15 @@ public class Minimax_Algorithm {
         }
 
         //check for a draw
+        boolean hasEmptyCell = false;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (boardState[i][j] == 0) {
-                    return -1;
+                    hasEmptyCell = true;
+                    break;
                 }
             }
         }
-        // If none of them have won, return 0
-        return 0;
+        return hasEmptyCell ? -1 : 0;
     }
 }
