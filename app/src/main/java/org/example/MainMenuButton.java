@@ -41,12 +41,12 @@ public class MainMenuButton extends Button {
                 this.getStyleClass().add("button-hovered");
             }
             //change cursor
-            this.getScene().setCursor(javafx.scene.Cursor.HAND);
+            App.scene.setCursor(javafx.scene.Cursor.HAND);
         });
         this.setOnMouseExited(e -> {
             this.getStyleClass().remove("button-hovered");
             //change cursor
-            this.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            App.scene.setCursor(javafx.scene.Cursor.DEFAULT);
         });
     }
 }
