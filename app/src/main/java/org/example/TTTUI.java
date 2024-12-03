@@ -6,6 +6,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 
 // Tic Tac Toe UI
 public class TTTUI extends VBox {
@@ -18,6 +20,7 @@ public class TTTUI extends VBox {
     private Image boardImage;
 
     private StyledText status;
+    
     public TTTUI() {
         board = new Button[3][3];
         boardState = new int[3][3];
@@ -32,9 +35,15 @@ public class TTTUI extends VBox {
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(22);
+        grid.setVgap(22);
 
+        // Set the background image of the grid
+        Rectangle background = new Rectangle(344, 344);
+        background.setFill(new ImagePattern(boardImage));
+        grid.add(background, 0, 0, 3, 3);  // Add the background image as a rectangle spanning the whole grid
+
+        // Create the hidden buttons for the Tic Tac Toe cells
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 board[i][j] = new Button("");
@@ -43,9 +52,7 @@ public class TTTUI extends VBox {
                 board[i][j].setPrefSize(100, 100);
                 board[i][j].setOnAction(e -> handleButtonClick((Button) e.getSource()));
                 //remove default button styling
-               // board[i][j].setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-               //remove margin/padding/border
-                board[i][j].setStyle("-fx-padding: 0; -fx-margin: 0; -fx-border-width: 0;");
+                board[i][j].setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; -fx-margin: 0; -fx-border-width: 0;");
                 grid.add(board[i][j], i, j);
             }
         }
@@ -67,8 +74,8 @@ public class TTTUI extends VBox {
         //update buttonState
         boardState[x][y] = xTurn ? 1 : 2;
         ImageView imageView = new ImageView(xTurn ? xImage : oImage);
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
+        imageView.setFitWidth(60);
+        imageView.setFitHeight(60);
         button.setGraphic(imageView);
         xTurn = !xTurn;
 
