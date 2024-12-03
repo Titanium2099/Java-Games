@@ -1,13 +1,17 @@
 package org.example;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 // Tic Tac Toe UI
 public class TTTUI extends VBox {
@@ -15,9 +19,9 @@ public class TTTUI extends VBox {
     private Button[][] board;
     private int[][] boardState;
     private boolean xTurn;
-    private Image xImage;
-    private Image oImage;
-    private Image boardImage;
+    private final Image xImage;
+    private final Image oImage;
+    private final Image boardImage;
 
     private StyledText status;
 
@@ -65,7 +69,7 @@ public class TTTUI extends VBox {
     }
 
     private void handleButtonClick(Button button) {
-        if(winner != 0) {
+        if (winner != 0) {
             return;
         }
 
@@ -90,6 +94,8 @@ public class TTTUI extends VBox {
         winner = checkWin();
         if (winner != 0) {
             System.out.println("Player " + winner + " wins!");
+            addConfetti();
+            addWinPopup(winner);
         }
     }
 
@@ -116,6 +122,75 @@ public class TTTUI extends VBox {
             return boardState[0][2];
         }
 
+        // Check for a draw
+        boolean draw = true;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (boardState[i][j] == 0) {
+                    draw = false;
+                    break;
+                }
+            }
+        }
+        if (draw) {
+            return 3;
+        }
         return 0;
+    }
+
+    private void addConfetti() {
+        //load image "confetti.gif" and display it on the screen using javafx.scene.image.ImageView
+        Image confettiImage = new Image(getClass().getResourceAsStream("/images/confetti.gif"));
+        ImageView confettiImageView = new ImageView(confettiImage);
+        confettiImageView.setFitWidth(App.scene.getWidth());
+        confettiImageView.setFitHeight(App.scene.getHeight());
+        //make position absolute
+        confettiImageView.setManaged(false);
+        this.getChildren().add(confettiImageView);
+        //destroy the confetti after 2.49 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(2.49));
+        pause.setOnFinished(e -> this.getChildren().remove(confettiImageView));
+        pause.play();
+    }
+
+    private void addWinPopup(int winner) {
+        Rectangle background = new Rectangle(App.scene.getWidth(), App.scene.getHeight());
+        background.setStyle("-fx-fill: rgba(0, 0, 0, 0.5);");
+        background.setManaged(false);
+        Rectangle textBox = new Rectangle(250,150);
+        textBox.setArcWidth(30);
+        textBox.setArcHeight(30);
+        textBox.setStyle("-fx-fill: white;");
+        StyledText winMessage;
+        if (winner == 1) {
+            winMessage = new StyledText("Player 1 Wins!");
+        } else if (winner == 2) {
+            winMessage = new StyledText("Player 2 Wins!");
+        } else {
+            winMessage = new StyledText("It's a Draw!");
+        }
+        MainMenuButton mainMenuButton = new MainMenuButton("Go Back");
+        mainMenuButton.setStyle("-fx-padding: 10;");
+        mainMenuButton.setOnAction(event -> {
+            App.scene.setRoot(App.mainMenu);
+        });
+    
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.getChildren().addAll(winMessage, mainMenuButton);
+        StackPane popup = new StackPane();
+        popup.getChildren().addAll(textBox, popupContent);
+        popup.setMaxWidth(textBox.getWidth());
+        popup.setMaxHeight(textBox.getHeight());
+        popup.setManaged(false);
+        popup.setLayoutX((App.scene.getWidth() / 2));
+        popup.setLayoutY((App.scene.getHeight() / 2));
+        this.getChildren().addAll(background, popup);
+    
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), background);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(1);
+        fadeIn.play();
     }
 }

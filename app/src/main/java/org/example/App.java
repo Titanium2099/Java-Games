@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     public static Scene scene; // static so it can be accessed from other classes
+    public static MainMenu mainMenu; //static so it can be accessed from other classes
     @Override
     public void start(Stage primaryStage) {
         URL imageResource = App.class.getClassLoader().getResource("assets/icon-512.png");
@@ -39,7 +40,7 @@ public class App extends Application {
             System.out.println("There was a security exception for Taskbar.setIconImage");
         }
 
-        MainMenu mainMenu = new MainMenu();
+        mainMenu = new MainMenu();
 
         scene = new Scene(mainMenu, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
