@@ -1,13 +1,21 @@
 package org.example;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 public class MainMenu extends VBox {
 
     public MainMenu() {
+        Image backIcon = new Image(getClass().getResourceAsStream("/images/backarrow.png"));
+        ImageView backIconView = new ImageView(backIcon);
+        backIconView.setFitWidth(20);
+        backIconView.setFitHeight(20);
+
         //Main Menu buttons
         MainMenuButton AIButton = new MainMenuButton("AI");
         MainMenuButton twoPlayerButton = new MainMenuButton("Local");
         MainMenuButton exitButton = new MainMenuButton("Exit");
+        exitButton.setGraphic(backIconView);
 
         this.getChildren().addAll(AIButton, twoPlayerButton, exitButton);
 
@@ -22,6 +30,8 @@ public class MainMenu extends VBox {
             MainMenuButton hardButton = new MainMenuButton("Hard");
             MainMenuButton impossibleButton = new MainMenuButton("Impossible");
             MainMenuButton backButton = new MainMenuButton("Back");
+            backButton.setGraphic(backIconView);
+
             this.getChildren().addAll(easyButton, mediumButton, hardButton, impossibleButton, backButton);
             backButton.setOnAction(e2 -> {
                 //delete current scene & create 3 main menu buttons

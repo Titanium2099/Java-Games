@@ -64,9 +64,18 @@ public class TTTUI extends VBox {
             }
         }
 
+        //add a button that goes back to the main menu
+        Image backIcon = new Image(getClass().getResourceAsStream("/images/backarrow.png"));
+        ImageView backIconView = new ImageView(backIcon);
+        backIconView.setFitWidth(20);
+        backIconView.setFitHeight(20);
+        MainMenuButton mainMenuButton = new MainMenuButton("Main Menu");
+        mainMenuButton.setOnAction(e -> App.scene.setRoot(App.mainMenu));
+        mainMenuButton.setGraphic(backIconView);
+
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
-        this.getChildren().addAll(status, grid);
+        this.getChildren().addAll(status, grid, mainMenuButton);
     }
 
     private void handleButtonClick(Button button) {
