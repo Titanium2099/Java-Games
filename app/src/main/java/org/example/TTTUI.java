@@ -121,7 +121,7 @@ public class TTTUI extends VBox {
         }
     }
 
-    public int checkWin() { //left public as Minimax algorithm (FUTURE) is going to need to be able to check the board state
+    private int checkWin() {
         // Check rows
         for (int i = 0; i < 3; i++) {
             if (boardState[i][0] != 0 && boardState[i][0] == boardState[i][1] && boardState[i][0] == boardState[i][2]) {
