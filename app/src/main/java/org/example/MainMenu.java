@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 public class MainMenu extends VBox {
 
+    MainMenuButton exitButton;
     public MainMenu() {
         Image backIcon = new Image(getClass().getResourceAsStream("/images/backarrow.png"));
         ImageView backIconView = new ImageView(backIcon);
@@ -14,7 +15,7 @@ public class MainMenu extends VBox {
         //Main Menu buttons
         MainMenuButton AIButton = new MainMenuButton("AI");
         MainMenuButton twoPlayerButton = new MainMenuButton("Local");
-        MainMenuButton exitButton = new MainMenuButton("Exit");
+        exitButton = new MainMenuButton("Exit");
         exitButton.setGraphic(backIconView);
 
         this.getChildren().addAll(AIButton, twoPlayerButton, exitButton);
@@ -36,6 +37,9 @@ public class MainMenu extends VBox {
             backButton.setOnAction(e2 -> {
                 //delete current scene & create 3 main menu buttons
                 this.getChildren().clear();
+                //fix to a weird bug where the button loses its graphic but JavaFX still thinks it has one
+                exitButton = new MainMenuButton("Exit");
+                exitButton.setGraphic(backIconView);
                 this.getChildren().addAll(AIButton, twoPlayerButton, exitButton);
             });
         });
