@@ -20,7 +20,9 @@ public class TTTUI extends VBox {
     private Image boardImage;
 
     private StyledText status;
-    
+
+    private int winner = 0;
+
     public TTTUI() {
         board = new Button[3][3];
         boardState = new int[3][3];
@@ -63,6 +65,10 @@ public class TTTUI extends VBox {
     }
 
     private void handleButtonClick(Button button) {
+        if(winner != 0) {
+            return;
+        }
+
         int[] indices = (int[]) button.getUserData();
         int x = indices[0];
         int y = indices[1];
@@ -80,5 +86,36 @@ public class TTTUI extends VBox {
         xTurn = !xTurn;
 
         status.setText(xTurn ? "Player 1's turn" : "Player 2's turn");
+
+        winner = checkWin();
+        if (winner != 0) {
+            System.out.println("Player " + winner + " wins!");
+        }
+    }
+
+    public int checkWin() { //left public as Minimax algorithm (FUTURE) is going to need to be able to check the board state
+        // Check rows
+        for (int i = 0; i < 3; i++) {
+            if (boardState[i][0] != 0 && boardState[i][0] == boardState[i][1] && boardState[i][0] == boardState[i][2]) {
+                return boardState[i][0];
+            }
+        }
+
+        // Check columns
+        for (int i = 0; i < 3; i++) {
+            if (boardState[0][i] != 0 && boardState[0][i] == boardState[1][i] && boardState[0][i] == boardState[2][i]) {
+                return boardState[0][i];
+            }
+        }
+
+        // Check diagonals
+        if (boardState[0][0] != 0 && boardState[0][0] == boardState[1][1] && boardState[0][0] == boardState[2][2]) {
+            return boardState[0][0];
+        }
+        if (boardState[0][2] != 0 && boardState[0][2] == boardState[1][1] && boardState[0][2] == boardState[2][0]) {
+            return boardState[0][2];
+        }
+
+        return 0;
     }
 }
