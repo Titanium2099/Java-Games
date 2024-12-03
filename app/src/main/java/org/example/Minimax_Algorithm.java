@@ -5,7 +5,7 @@ public class Minimax_Algorithm {
     private static final int HUMAN_PLAYER = 1;
     private static final int AI_PLAYER = 2;
 
-    public static int[] findBestMove(int[][] boardState) {
+    public static int[] findBestMove(int[][] boardState, int maxDepth) {
         int bestValue = Integer.MIN_VALUE;
         int[] bestMove = {-1, -1};
         // Loop through all cells, evaluate minimax function for empty cells, and return the best move (highest score)
@@ -13,7 +13,7 @@ public class Minimax_Algorithm {
             for (int j = 0; j < 3; j++) {
                 if (boardState[i][j] == 0) {
                     boardState[i][j] = AI_PLAYER;
-                    int moveValue = minimax(boardState, 0, false);
+                    int moveValue = minimax(boardState, 0, false, maxDepth);
                     boardState[i][j] = 0; // Undo the move (after evaluating score)
                     if (moveValue > bestValue) {
                         bestMove[0] = i;
@@ -27,7 +27,7 @@ public class Minimax_Algorithm {
         return bestMove;
     }
 
-    private static int minimax(int[][] boardState, int depth, boolean isMaximizingPlayer) {
+    private static int minimax(int[][] boardState, int depth, boolean isMaximizingPlayer, int maxDepth) {
         int score = checkWin(boardState);
         if (score == 10) {
             return score - depth;
@@ -35,18 +35,18 @@ public class Minimax_Algorithm {
         if (score == -10) {
             return score + depth;
         }
-        if (score == -1) { // Draw (base case)
+        if (score == 0 || depth == maxDepth) { // stop depth limit is hit or draw is achieved (base case)
             return 0;
         }
         //if we are "maximizing" we are trying to maximize the AI's score
-        //else we are trying to minimize the human player's score (hence the name "minimax" ;( )
+        //else we are trying to minimize the human player's score (hence the name "minimax" ;) )
         if (isMaximizingPlayer) {
             int best = Integer.MIN_VALUE;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (boardState[i][j] == 0) {
                         boardState[i][j] = AI_PLAYER;
-                        best = Math.max(best, minimax(boardState, depth + 1, false));
+                        best = Math.max(best, minimax(boardState, depth + 1, false, maxDepth));
                         boardState[i][j] = 0;
                     }
                 }
@@ -58,7 +58,7 @@ public class Minimax_Algorithm {
                 for (int j = 0; j < 3; j++) {
                     if (boardState[i][j] == 0) {
                         boardState[i][j] = HUMAN_PLAYER;
-                        best = Math.min(best, minimax(boardState, depth + 1, true));
+                        best = Math.min(best, minimax(boardState, depth + 1, true, maxDepth));
                         boardState[i][j] = 0;
                     }
                 }
