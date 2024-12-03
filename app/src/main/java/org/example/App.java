@@ -3,17 +3,44 @@
  */
 package org.example;
 
+import java.awt.Taskbar;
+import java.awt.Toolkit;
+import java.net.URL;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 
 public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        URL imageResource = App.class.getClassLoader().getResource("icon-512.png");
+        if (imageResource == null) {
+            System.out.println("Icon resource not found!");
+            return;
+        }
+
+        // Set the stage icon
+        primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
+
+
+        // Configure the Taskbar icon (requires Java 9+)
+        try {
+            Taskbar taskbar = Taskbar.getTaskbar();
+            java.awt.Image awtImage = Toolkit.getDefaultToolkit().getImage(imageResource);
+            taskbar.setIconImage(awtImage);
+        } catch (UnsupportedOperationException e) {
+            System.out.println("The OS does not support Taskbar.setIconImage");
+        } catch (SecurityException e) {
+            System.out.println("There was a security exception for Taskbar.setIconImage");
+        }
+
         // Create UI components
         Label label = new Label("Hello World!");
         Button button = new Button("Click Me");
@@ -24,8 +51,9 @@ public class App extends Application {
         layout.getChildren().addAll(label, button);
 
         // Scene and stage setup
-        Scene scene = new Scene(layout, 300, 200);
-        primaryStage.setTitle("JavaFX Application");
+        Scene scene = new Scene(layout, 1120, 630);
+        primaryStage.setTitle("Tic Tac Toe");
+        primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
         primaryStage.setScene(scene);
         primaryStage.show();
     }
