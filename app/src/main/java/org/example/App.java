@@ -49,7 +49,7 @@ public class App extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         */
-        Connect4 connect4 = new Connect4();
+        Connect4 connect4 = new Connect4(1);
         scene = new Scene(connect4, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
         primaryStage.setTitle("Connect 4");

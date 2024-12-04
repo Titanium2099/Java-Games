@@ -24,7 +24,18 @@ public class Connect4 extends VBox {
     private Boolean overrideLeaveColumn = false;
 
     private StyledText status;
-    public Connect4() {
+
+    /*
+     * gameModes are as follows:
+     * 0: Player vs Player
+     * 1: Player vs AI (Easy)
+     * 2: Player vs AI (Medium)
+     * 3: Player vs AI (Hard)
+     * 4: Player vs AI (Impossible)
+     */
+    private int gameMode;
+    public Connect4(int gameMode) {
+        this.gameMode = gameMode;
         //draw the connect 4 board
         setAlignment(Pos.CENTER);
         setPrefSize(360, 360);
@@ -38,7 +49,7 @@ public class Connect4 extends VBox {
         hBox.setPadding(new Insets(10, 10, 10, 10));
         hBox.setStyle("-fx-background-color:#00a5db; -fx-background-radius: 40; -fx-border-color: #0082ac; -fx-border-width: 8; -fx-border-radius: 30;");
         for (int i = 0; i < 7; i++) {
-            VBox vBox = connect4Column();
+            VBox vBox = connect4Column(i);
             hBox.getChildren().add(vBox);
         }
         status = new StyledText("Player 1's turn");
@@ -50,11 +61,13 @@ public class Connect4 extends VBox {
 
     }
 
-    private VBox connect4Column() {
+    private VBox connect4Column(int index) {
         VBox vBox = new VBox();
         vBox.setPrefWidth(60);
         vBox.setPrefHeight(420);
         vBox.setStyle("-fx-background-radius: 30;");
+        //add attribute index to vBox
+        vBox.setUserData(index);
         for (int i = 0; i < 6; i++) {
             Circle circle = new Circle(20, Color.web("#eeeeee"));
             VBox.setMargin(circle, new Insets(10)); // Add margin to circles
@@ -126,8 +139,17 @@ public class Connect4 extends VBox {
         });        
         vBox.setOnMouseClicked(e -> {
             if (currentChip == -100) return;  // Do nothing if the current chip is not set
-            board[currentChip][currentPlayer] = 1;
+            if (gameMode != 0 && currentPlayer == 2) return; 
+            board[currentChip][((int) vBox.getUserData())] = currentPlayer;
 
+            //print board for debugging
+            for (int row = 0; row < 6; row++) {
+                for (int col = 0; col < 7; col++) {
+                    System.out.print(board[row][col] + " ");
+                }
+                System.out.println("");
+            }
+            System.err.println("_________ move made by player " + currentPlayer + " in column " + ((int) vBox.getUserData()) + " _________");
             int i = currentChip;
             Circle circle = (Circle) vBox.getChildren().get(i);
             circle.setFill(Color.web(currentPlayer == 1 ? "#ff6542" : "#f4d35e"));
@@ -159,6 +181,10 @@ public class Connect4 extends VBox {
             } else if (winner == 3) {
                 addConfetti();
                 TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            }
+
+            if(gameMode != 0 && currentPlayer == 2) {
+                AI_communicator();
             }
         });
         return vBox;
@@ -218,7 +244,7 @@ public class Connect4 extends VBox {
         return isDraw ? 3 : 0;  // Return 3 for draw, 0 for no winner
     }    
 
-        private void addConfetti() {
+    private void addConfetti() {
         //load image "confetti.gif" and display it on the screen using javafx.scene.image.ImageView
         Image confettiImage = new Image(getClass().getResourceAsStream("/images/confetti.gif"));
         ImageView confettiImageView = new ImageView(confettiImage);
@@ -264,4 +290,54 @@ public class Connect4 extends VBox {
         fadeIn.setCycleCount(1);
         fadeIn.play();
     }
+    
+    private void AI_communicator() {
+        // Get the best column from the Minimax algorithm for AI (Player 2)
+        int bestColumn = Minimax_C4_Algorithm.findBestMove(board);
+    
+        // Find the first empty row in that column
+        int rowToPlace = -1;
+        for (int row = 5; row >= 0; row--) {
+            if (board[row][bestColumn] == 0) {
+                rowToPlace = row;
+                break;
+            }
+        }
+    
+        // If the column is full, there's nothing to do (this should be rare)
+        if (rowToPlace == -1) {
+            TPopup("The AI tried to place a chip in a full column! (this should not happen)", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            return;
+        }
+    
+        // Update the board with the AI's move (Player 2)
+        board[rowToPlace][bestColumn] = 2;
+    
+        // Update the visual board (animate the chip falling)
+        VBox columnVBox = (VBox) ((HBox) getChildren().get(1)).getChildren().get(bestColumn); // Get the VBox for the column
+        Circle targetCircle = (Circle) columnVBox.getChildren().get(rowToPlace); // Get the target Circle
+        targetCircle.setFill(Color.web("#f4d35e")); // Set color for AI's chip
+    
+        // Optionally, add fade or fall animation for the chip
+        FadeTransition fade = new FadeTransition(Duration.seconds(1), targetCircle);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.setCycleCount(1);
+        fade.play();
+    
+        // Switch the current player to Player 1
+        currentPlayer = 1;
+        status.setText("Player 1's turn");
+    
+        // Check if the AI's move resulted in a win
+        int winner = checkWinner();
+        if (winner == 2) {
+            addConfetti();
+            TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+        } else if (winner == 3) {
+            addConfetti();
+            TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+        }
+    }
+    
 }
