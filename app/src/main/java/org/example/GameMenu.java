@@ -11,6 +11,9 @@ public class GameMenu extends HBox {
         TicTacToe.setOnMouseClicked(e -> {
             App.scene.setRoot(App.mainMenu);
         });
+        Connect4.setOnMouseClicked(e -> {
+            App.scene.setRoot(App.mainMenuC4);
+        });
         this.getChildren().addAll(TicTacToe, Connect4);
         this.setStyle("-fx-alignment: center;");
 }

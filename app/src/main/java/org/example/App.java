@@ -17,6 +17,7 @@ public class App extends Application {
 
     public static Scene scene; // static so it can be accessed from other classes
     public static MainMenu mainMenu; //static so it can be accessed from other classes
+    public static MainMenuC4 mainMenuC4; //static so it can be accessed from other classes
     public static GameMenu MainGameMenu; //static so it can be accessed from other classes
     @Override
     public void start(Stage primaryStage) {
@@ -41,7 +42,7 @@ public class App extends Application {
             System.out.println("There was a security exception for Taskbar.setIconImage");
         }
         mainMenu = new MainMenu();
-
+        mainMenuC4 = new MainMenuC4();
         /*
         scene = new Scene(mainMenu, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
