@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class Connect4 extends VBox {
@@ -23,6 +22,8 @@ public class Connect4 extends VBox {
     private int currentPlayer = 1; // 1 for player 1, 2 for player 2
     private int currentChip = -100;
     private Boolean overrideLeaveColumn = false;
+
+    private StyledText status;
     public Connect4() {
         //draw the connect 4 board
         setAlignment(Pos.CENTER);
@@ -40,6 +41,10 @@ public class Connect4 extends VBox {
             VBox vBox = connect4Column();
             hBox.getChildren().add(vBox);
         }
+        status = new StyledText("Player 1's turn");
+        //add buttom margin to status
+        VBox.setMargin(status, new Insets(0, 0, 20, 0));
+        getChildren().add(status);
         getChildren().add(hBox);
         //end
 
@@ -142,8 +147,121 @@ public class Connect4 extends VBox {
             circle.setOpacity(1);
             currentChip = -100;
             currentPlayer = currentPlayer == 1 ? 2 : 1;
+            status.setText(currentPlayer == 1 ? "Player 1's turn" : "Player 2's turn");
             overrideLeaveColumn = true;
+            int winner = checkWinner();
+            if (winner == 1) {
+                addConfetti();
+                TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            } else if (winner == 2) {
+                addConfetti();
+                TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            } else if (winner == 3) {
+                addConfetti();
+                TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            }
         });
         return vBox;
+    }
+
+    private int checkWinner() {
+        // Check horizontal win
+        for (int row = 0; row < 6; row++) {
+            for (int col = 0; col < 4; col++) {
+                if (board[row][col] != 0 && board[row][col] == board[row][col + 1] 
+                    && board[row][col] == board[row][col + 2] && board[row][col] == board[row][col + 3]) {
+                    return board[row][col];  // Return the player number (1 or 2)
+                }
+            }
+        }
+    
+        // Check vertical win
+        for (int col = 0; col < 7; col++) {
+            for (int row = 0; row < 3; row++) {
+                if (board[row][col] != 0 && board[row][col] == board[row + 1][col]
+                    && board[row][col] == board[row + 2][col] && board[row][col] == board[row + 3][col]) {
+                    return board[row][col];  // Return the player number (1 or 2)
+                }
+            }
+        }
+    
+        // Check diagonal (top-left to bottom-right) win
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 4; col++) {
+                if (board[row][col] != 0 && board[row][col] == board[row + 1][col + 1]
+                    && board[row][col] == board[row + 2][col + 2] && board[row][col] == board[row + 3][col + 3]) {
+                    return board[row][col];  // Return the player number (1 or 2)
+                }
+            }
+        }
+    
+        // Check diagonal (top-right to bottom-left) win
+        for (int row = 0; row < 3; row++) {
+            for (int col = 3; col < 7; col++) {
+                if (board[row][col] != 0 && board[row][col] == board[row + 1][col - 1]
+                    && board[row][col] == board[row + 2][col - 2] && board[row][col] == board[row + 3][col - 3]) {
+                    return board[row][col];  // Return the player number (1 or 2)
+                }
+            }
+        }
+        
+        //check for draw
+        boolean isDraw = true;
+        for (int row = 0; row < 6; row++) {
+            for (int col = 0; col < 7; col++) {
+                if (board[row][col] == 0) {
+                    isDraw = false;
+                    break;
+                }
+            }
+        }
+        return isDraw ? 3 : 0;  // Return 3 for draw, 0 for no winner
+    }    
+
+        private void addConfetti() {
+        //load image "confetti.gif" and display it on the screen using javafx.scene.image.ImageView
+        Image confettiImage = new Image(getClass().getResourceAsStream("/images/confetti.gif"));
+        ImageView confettiImageView = new ImageView(confettiImage);
+        confettiImageView.setFitWidth(App.scene.getWidth());
+        confettiImageView.setFitHeight(App.scene.getHeight());
+        //make position absolute
+        confettiImageView.setManaged(false);
+        this.getChildren().add(confettiImageView);
+        //destroy the confetti after 2.49 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(2.49));
+        pause.setOnFinished(e -> this.getChildren().remove(confettiImageView));
+        pause.play();
+    }
+
+    private void TPopup(String text, String buttonText, Runnable onButtonClick) {
+        Rectangle background = new Rectangle(App.scene.getWidth(), App.scene.getHeight());
+        background.setStyle("-fx-fill: rgba(0, 0, 0, 0.5);");
+        background.setManaged(false);
+        Rectangle textBox = new Rectangle(250, 150);
+        textBox.setArcWidth(30);
+        textBox.setArcHeight(30);
+        textBox.setStyle("-fx-fill: white;");
+        StyledText winMessage = new StyledText(text);
+        MainMenuButton mainMenuButton = new MainMenuButton(buttonText);
+        mainMenuButton.setStyle("-fx-padding: 10;");
+        mainMenuButton.setOnAction(event -> onButtonClick.run());
+
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.getChildren().addAll(winMessage, mainMenuButton);
+        StackPane popup = new StackPane();
+        popup.getChildren().addAll(textBox, popupContent);
+        popup.setMaxWidth(textBox.getWidth());
+        popup.setMaxHeight(textBox.getHeight());
+        popup.setManaged(false);
+        popup.setLayoutX((App.scene.getWidth() / 2));
+        popup.setLayoutY((App.scene.getHeight() / 2));
+        this.getChildren().addAll(background, popup);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), background);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(1);
+        fadeIn.play();
     }
 }
