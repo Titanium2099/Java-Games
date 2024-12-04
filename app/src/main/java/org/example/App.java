@@ -44,6 +44,8 @@ public class App extends Application {
 
         scene = new Scene(mainMenu, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
+        primaryStage.setTitle("Tic Tac Toe");
+        primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
         primaryStage.setScene(scene);
         primaryStage.show();
 
