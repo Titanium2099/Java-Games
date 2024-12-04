@@ -25,7 +25,10 @@ public class MainMenuButton extends Button {
             // Fallback to Arial
             this.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         }
-        
+        //calculate how much space the text takes up
+        double textWidth = this.getFont().getSize() * text.length();
+        //set the minimum width to the text width
+        this.setMinWidth(textWidth + 20);
         //weird fix to border radius glitch
         this.heightProperty().addListener((obs, oldHeight, newHeight) -> {
             double radius = newHeight.doubleValue() / 2;
