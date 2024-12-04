@@ -1,7 +1,14 @@
 package org.example;
 
-public class Minimax_C4_Algorithm {
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 
+public class Minimax_C4_Algorithm {
+    public static int MaxDepth;
     // Evaluate the board state. Returns a score based on how favorable the board is for Player 2 (AI).
     private static int evaluateBoard(int[][] board) {
         int score = 0;
@@ -175,23 +182,73 @@ public class Minimax_C4_Algorithm {
         }
     }
 
+    // Helper method to deep copy a 2D array
+    private static int[][] deepCopyBoard(int[][] original) {
+        int[][] copy = new int[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = original[i].clone();  // Create a copy of each row
+        }
+        return copy;
+    }
+
+    static class MoveEvaluationTask implements Callable<MoveEvaluation> {
+        private final int[][] board;
+        private final int column;
+    
+        public MoveEvaluationTask(int[][] board, int column) {
+            this.board = deepCopyBoard(board);  // Avoid concurrency issues by deep copying
+            this.column = column;
+        }
+    
+        @Override
+        public MoveEvaluation call() {
+            if (makeMove(board, column, 2)) {
+                int score = minimax(board, MaxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+                undoMove(board, column);
+                return new MoveEvaluation(column, score);
+            }
+            return new MoveEvaluation(column, Integer.MIN_VALUE);
+        }
+    }
+    
+    static class MoveEvaluation {
+        int column;
+        int score;
+    
+        public MoveEvaluation(int column, int score) {
+            this.column = column;
+            this.score = score;
+        }
+    }
+    
     // Find the best move for the AI (Player 2)
     public static int findBestMove(int[][] board) {
-        int bestScore = Integer.MIN_VALUE;
-        int bestMove = -1;
+        ForkJoinPool pool = ForkJoinPool.commonPool();
+        MoveEvaluationTask[] tasks = new MoveEvaluationTask[7];
 
-        // Evaluate each column to find the best move
         for (int col = 0; col < 7; col++) {
             if (board[0][col] == 0) {  // If the column is not full
-                makeMove(board, col, 2);  // Try AI move (Player 2)
-                int score = minimax(board,5, Integer.MIN_VALUE, Integer.MAX_VALUE, false);  // Depth 5 for AI
-                undoMove(board, col);
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = col;
-                }
+                tasks[col] = new MoveEvaluationTask(board, col);
             }
         }
-        return bestMove;  // Return the best column index
+
+        try {
+            List<Future<MoveEvaluation>> results = pool.invokeAll(Arrays.asList(tasks));
+            int bestScore = Integer.MIN_VALUE;
+            int bestMove = -1;
+
+            for (Future<MoveEvaluation> result : results) {
+                MoveEvaluation eval = result.get();
+                if (eval.score > bestScore) {
+                    bestScore = eval.score;
+                    bestMove = eval.column;
+                }
+            }
+            return bestMove;
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return -1;  // Fallback if something goes wrong
     }
 }

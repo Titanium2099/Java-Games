@@ -31,11 +31,18 @@ public class Connect4 extends VBox {
      * 1: Player vs AI (Easy)
      * 2: Player vs AI (Medium)
      * 3: Player vs AI (Hard)
-     * 4: Player vs AI (Impossible)
      */
     private int gameMode;
     public Connect4(int gameMode) {
         this.gameMode = gameMode;
+        if(gameMode == 1){
+            Minimax_C4_Algorithm.MaxDepth = 1;
+        }else if(gameMode == 2){
+            Minimax_C4_Algorithm.MaxDepth = 5;
+        }else if(gameMode == 3){
+            Minimax_C4_Algorithm.MaxDepth = 10;
+        }
+            
         //draw the connect 4 board
         setAlignment(Pos.CENTER);
         setPrefSize(360, 360);
@@ -167,6 +174,25 @@ public class Connect4 extends VBox {
             fadeTransitions.removeAll(transitionsToRemove);
             //reset opacity
             circle.setOpacity(1);
+            /*
+             * run a JavaFX equivelent of the following animation:
+             *         @keyframes playChecker {
+            from {
+		padding: 10px;
+                opacity: 0;
+                transform: scaleX(.8) scaleY(.8)
+            }
+            50%{
+                transform: scaleX(1.2) scaleY(1.2);
+            }
+            to{
+		padding: 10px;
+                opacity: 1;
+                transform: scaleX(1) scaleY(1);  
+            }
+        }
+             */
+            
             currentChip = -100;
             currentPlayer = currentPlayer == 1 ? 2 : 1;
             status.setText(currentPlayer == 1 ? "Player 1's turn" : "Player 2's turn");
@@ -293,8 +319,14 @@ public class Connect4 extends VBox {
     
     private void AI_communicator() {
         // Get the best column from the Minimax algorithm for AI (Player 2)
-        int bestColumn = Minimax_C4_Algorithm.findBestMove(board);
-    
+        int bestColumn = -100;
+        try{
+            bestColumn = Minimax_C4_Algorithm.findBestMove(board);
+        }catch(Exception e){
+            TPopup("The AI hit an error! (this means that you probably outplayed the AI and it couldn't find a move)", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            return;
+        }
+        if(bestColumn == -100) return;
         // Find the first empty row in that column
         int rowToPlace = -1;
         for (int row = 5; row >= 0; row--) {
