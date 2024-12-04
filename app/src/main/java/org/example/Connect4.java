@@ -62,8 +62,15 @@ public class Connect4 extends VBox {
         status = new StyledText("Player 1's turn");
         //add buttom margin to status
         VBox.setMargin(status, new Insets(0, 0, 20, 0));
+
+        //button to go back to main menu
+        MainMenuButton backButton = new MainMenuButton("Main Menu");
+        backButton.setOnAction(e -> App.scene.setRoot(App.mainMenuC4));
+        VBox.setMargin(backButton, new Insets(20, 0, 0, 0));
+        
         getChildren().add(status);
         getChildren().add(hBox);
+        getChildren().add(backButton);
         //end
 
     }
