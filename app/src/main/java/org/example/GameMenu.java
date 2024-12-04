@@ -8,6 +8,9 @@ public class GameMenu extends HBox {
         this.setSpacing(20);
         GameMenuCard TicTacToe = new GameMenuCard("Tic Tac Toe", "images/TTT.png");
         GameMenuCard Connect4 = new GameMenuCard("Connect 4", "images/Connect4.png");
+        TicTacToe.setOnMouseClicked(e -> {
+            App.scene.setRoot(App.mainMenu);
+        });
         this.getChildren().addAll(TicTacToe, Connect4);
         this.setStyle("-fx-alignment: center;");
 }

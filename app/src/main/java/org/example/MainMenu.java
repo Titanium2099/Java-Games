@@ -40,6 +40,9 @@ public class MainMenu extends VBox {
                 //fix to a weird bug where the button loses its graphic but JavaFX still thinks it has one
                 exitButton = new MainMenuButton("Exit");
                 exitButton.setGraphic(backIconView);
+                exitButton.setOnAction(e3 -> {
+                    App.scene.setRoot(App.MainGameMenu);
+                });
                 this.getChildren().addAll(AIButton, twoPlayerButton, exitButton);
             });
             easyButton.setOnAction(e2 -> {
@@ -63,6 +66,8 @@ public class MainMenu extends VBox {
             TTTUI tttui = new TTTUI(0);
             App.scene.setRoot(tttui);
         });
-        exitButton.setOnAction(e -> System.exit(0));
+        exitButton.setOnAction(e3 -> {
+            App.scene.setRoot(App.MainGameMenu);
+        });
     }
 }
