@@ -140,7 +140,7 @@ public class TTTUI extends VBox {
                 App.scene.setRoot(App.mainMenu);
             });
         }
-        if(gameMode != 0 && !xTurn){
+        if (gameMode != 0 && !xTurn) {
             AI_communicator(); //call the AI
         }
     }
@@ -231,32 +231,36 @@ public class TTTUI extends VBox {
         fadeIn.play();
     }
 
-    private void AI_communicator(){
-        int[] returned = Minimax_Algorithm.findBestMove(boardState, gameMode == 1 ? EASY_MAX_DEPTH : gameMode == 2 ? MEDIUM_MAX_DEPTH : gameMode == 3 ? HARD_MAX_DEPTH : IMPOSSIBLE_MAX_DEPTH);
-        boardState[returned[0]][returned[1]] = 2;
-        ImageView imageView = new ImageView(oImage);
-        imageView.setFitWidth(60);
-        imageView.setFitHeight(60);
-        board[returned[0]][returned[1]].setGraphic(imageView);
-        xTurn = true;
-        status.setText("Player 1's turn");
-        winner = checkWin();
-        if (winner != 0) {
-            System.out.println("Player " + winner + " wins!");
-            addConfetti();
-            System.out.println("Player " + winner + " wins!");
-            String winnerText;
-            if (winner == 1) {
-                winnerText = "Player 1 Wins!";
-            } else if (winner == 2) {
-                winnerText = "Player 2 Wins!";
-            } else {
-                winnerText = "It's a Draw!";
+    private void AI_communicator() {
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+            int[] returned = Minimax_Algorithm.findBestMove(boardState, gameMode == 1 ? EASY_MAX_DEPTH : gameMode == 2 ? MEDIUM_MAX_DEPTH : gameMode == 3 ? HARD_MAX_DEPTH : IMPOSSIBLE_MAX_DEPTH);
+            boardState[returned[0]][returned[1]] = 2;
+            ImageView imageView = new ImageView(oImage);
+            imageView.setFitWidth(60);
+            imageView.setFitHeight(60);
+            board[returned[0]][returned[1]].setGraphic(imageView);
+            xTurn = true;
+            status.setText("Player 1's turn");
+            winner = checkWin();
+            if (winner != 0) {
+                System.out.println("Player " + winner + " wins!");
+                addConfetti();
+                System.out.println("Player " + winner + " wins!");
+                String winnerText;
+                if (winner == 1) {
+                    winnerText = "Player 1 Wins!";
+                } else if (winner == 2) {
+                    winnerText = "Player 2 Wins!";
+                } else {
+                    winnerText = "It's a Draw!";
+                }
+                TPopup(winnerText, "Go Back", () -> {
+                    // Callback action, e.g., return to main menu
+                    App.scene.setRoot(App.mainMenu);
+                });
             }
-            TPopup(winnerText, "Go Back", () -> {
-                // Callback action, e.g., return to main menu
-                App.scene.setRoot(App.mainMenu);
-            });
-        }
+        });
+        pause.play();
     }
 }
