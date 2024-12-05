@@ -45,19 +45,31 @@ public class Minimax_C4_Algorithm {
     // Evaluate a line of 4 cells in a direction (used for horizontal, vertical, diagonal scoring)
     private static int evaluateLine(int[][] board, int row, int col, int dRow, int dCol, int player) {
         int count = 0;
-        for (int i = 0; i < 4; i++) {
-            int r = row + i * dRow;
-            int c = col + i * dCol;
-            if (r >= 0 && r < 6 && c >= 0 && c < 7) {
+    
+        // Vertical-specific condition: ensure all rows below the evaluated line are filled
+        if (dRow == 1 && dCol == 0) {
+            for (int i = 0; i < 4; i++) {
+                int r = row + i * dRow;
+                if (r >= 6 || board[r][col] != player) {
+                    return 0;  // Blocked, incomplete, or invalid vertical line
+                }
+            }
+        } else {
+            // General case for horizontal and diagonal checks
+            for (int i = 0; i < 4; i++) {
+                int r = row + i * dRow;
+                int c = col + i * dCol;
+    
+                if (r < 0 || r >= 6 || c < 0 || c >= 7 || (board[r][c] != 0 && board[r][c] != player)) {
+                    return 0;  // Invalid line
+                }
                 if (board[r][c] == player) {
                     count++;
-                } else if (board[r][c] != 0) {
-                    return 0;  // A mixed line (blocked by the opponent)
                 }
             }
         }
         return count;
-    }
+    }    
 
     // Check if a player has won
     private static int checkWinner(int[][] board) {
