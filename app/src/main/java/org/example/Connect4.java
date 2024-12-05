@@ -24,7 +24,7 @@ public class Connect4 extends VBox {
     private Boolean overrideLeaveColumn = false;
 
     private StyledText status;
-
+    List<FadeTransition> fadeTransitions;
     /*
      * gameModes are as follows:
      * 0: Player vs Player
@@ -89,38 +89,10 @@ public class Connect4 extends VBox {
         }
 
         // List to hold FadeTransition objects for each circle
-        List<FadeTransition> fadeTransitions = new ArrayList<>();
+        fadeTransitions = new ArrayList<>();
 
         vBox.setOnMouseEntered(e -> {
-            overrideLeaveColumn = false;
-            vBox.setStyle("-fx-background-color: #017399; -fx-background-radius: 20;");
-
-            // Loop through the circles
-            for (int i = 5; i >= 0; i--) {
-                Circle circle = (Circle) vBox.getChildren().get(i);
-
-                // Check if the circle is white
-                if (circle.getFill().equals(Color.web("#eeeeee"))) {
-                    currentChip = i;
-                    
-                    // Change the color based on the current player
-                    if (currentPlayer == 1) circle.setFill(Color.web("#ff6542"));
-                    else circle.setFill(Color.web("#f4d35e"));
-                    
-                    // Create a FadeTransition for the circle
-                    FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), circle);
-                    fadeTransition.setFromValue(0);  // Start opacity at 0
-                    fadeTransition.setToValue(1);    // End opacity at 1
-                    fadeTransition.setCycleCount(FadeTransition.INDEFINITE);  // Loop the animation
-                    fadeTransition.setAutoReverse(true);  // Make the fade transition back and forth
-                    fadeTransition.play();  // Start the animation
-
-                    // Store the FadeTransition in the list
-                    fadeTransitions.add(fadeTransition);
-
-                    break;
-                }
-            }
+            rowHover(vBox);
         });
 
         vBox.setOnMouseExited(e -> {
@@ -218,11 +190,44 @@ public class Connect4 extends VBox {
 
             if(gameMode != 0 && currentPlayer == 2) {
                 AI_communicator();
+            }else{
+                rowHover(vBox);//reset the hover effect
             }
         });
         return vBox;
     }
 
+    private void rowHover(VBox vBox){
+        overrideLeaveColumn = false;
+        vBox.setStyle("-fx-background-color: #017399; -fx-background-radius: 20;");
+
+        // Loop through the circles
+        for (int i = 5; i >= 0; i--) {
+            Circle circle = (Circle) vBox.getChildren().get(i);
+
+            // Check if the circle is white
+            if (circle.getFill().equals(Color.web("#eeeeee"))) {
+                currentChip = i;
+                
+                // Change the color based on the current player
+                if (currentPlayer == 1) circle.setFill(Color.web("#ff6542"));
+                else circle.setFill(Color.web("#f4d35e"));
+                
+                // Create a FadeTransition for the circle
+                FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), circle);
+                fadeTransition.setFromValue(0);  // Start opacity at 0
+                fadeTransition.setToValue(1);    // End opacity at 1
+                fadeTransition.setCycleCount(FadeTransition.INDEFINITE);  // Loop the animation
+                fadeTransition.setAutoReverse(true);  // Make the fade transition back and forth
+                fadeTransition.play();  // Start the animation
+
+                // Store the FadeTransition in the list
+                fadeTransitions.add(fadeTransition);
+
+                break;
+            }
+        }
+    }
     private int checkWinner() {
         // Check horizontal win
         for (int row = 0; row < 6; row++) {
