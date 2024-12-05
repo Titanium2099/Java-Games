@@ -207,13 +207,13 @@ public class Connect4 extends VBox {
             int winner = checkWinner();
             if (winner == 1) {
                 addConfetti();
-                TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+                TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
             } else if (winner == 2) {
                 addConfetti();
-                TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+                TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
             } else if (winner == 3) {
                 addConfetti();
-                TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+                TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
             }
 
             if(gameMode != 0 && currentPlayer == 2) {
@@ -330,7 +330,10 @@ public class Connect4 extends VBox {
         try{
             bestColumn = Minimax_C4_Algorithm.findBestMove(board);
         }catch(Exception e){
-            TPopup("The AI hit an error! (this means that you probably outplayed the AI and it couldn't find a move)", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            TPopup("The AI hit an error! (this means that you probably outplayed the AI and it couldn't find a move)", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+            System.err.println("AI hit an error: ");
+            System.err.println(e);
+            e.printStackTrace();
             return;
         }
         if(bestColumn == -100) return;
@@ -345,7 +348,7 @@ public class Connect4 extends VBox {
     
         // If the column is full, there's nothing to do (this should be rare)
         if (rowToPlace == -1) {
-            TPopup("The AI tried to place a chip in a full column! (this should not happen)", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            TPopup("The AI tried to place a chip in a full column! (this should not happen)", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
             return;
         }
     
@@ -370,12 +373,15 @@ public class Connect4 extends VBox {
     
         // Check if the AI's move resulted in a win
         int winner = checkWinner();
-        if (winner == 2) {
+        if(winner == 1){
             addConfetti();
-            TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+        } if (winner == 2) {
+            addConfetti();
+            TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
         } else if (winner == 3) {
             addConfetti();
-            TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenu));
+            TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
         }
     }
     
