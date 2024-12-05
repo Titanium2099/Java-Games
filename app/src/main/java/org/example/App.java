@@ -62,7 +62,7 @@ public class App extends Application {
         MainGameMenu = new GameMenu();
         scene = new Scene(MainGameMenu, 1120, 630);
         scene.getStylesheets().add(getClass().getResource("/main.css").toExternalForm());
-        primaryStage.setTitle("Connect 4");
+        primaryStage.setTitle("Game Player");
         primaryStage.getIcons().add(new Image("file:src/main/resources/512x512.png")); // Replace with your icon path
         primaryStage.setScene(scene);
         primaryStage.show();
