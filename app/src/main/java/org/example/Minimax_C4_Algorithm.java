@@ -73,56 +73,53 @@ public class Minimax_C4_Algorithm {
 
     // Check if a player has won
     private static int checkWinner(int[][] board) {
-        // Horizontal, Vertical, and Diagonal checks for winner
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 4; col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row][col + 1] 
-                    && board[row][col] == board[row][col + 2] && board[row][col] == board[row][col + 3]) {
-                    return board[row][col];
-                }
-            }
-        }
-        
-        for (int col = 0; col < 7; col++) {
-            for (int row = 0; row < 3; row++) {
-                if (board[row][col] != 0 && board[row][col] == board[row + 1][col]
-                    && board[row][col] == board[row + 2][col] && board[row][col] == board[row + 3][col]) {
-                    return board[row][col];
-                }
-            }
-        }
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 4; col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row + 1][col + 1]
-                    && board[row][col] == board[row + 2][col + 2] && board[row][col] == board[row + 3][col + 3]) {
-                    return board[row][col];
-                }
-            }
-        }
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 3; col < 7; col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row + 1][col - 1]
-                    && board[row][col] == board[row + 2][col - 2] && board[row][col] == board[row + 3][col - 3]) {
-                    return board[row][col];
-                }
-            }
-        }
-
-        // Check for draw
-        boolean isDraw = true;
+        boolean hasEmpty = false;
+    
+        // Check horizontal, vertical, and diagonal lines
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 7; col++) {
+                // Check for empty spaces
                 if (board[row][col] == 0) {
-                    isDraw = false;
-                    break;
+                    hasEmpty = true;
+                }
+    
+                // Check horizontal (right)
+                if (col <= 3 && board[row][col] != 0 &&
+                    board[row][col] == board[row][col + 1] &&
+                    board[row][col] == board[row][col + 2] &&
+                    board[row][col] == board[row][col + 3]) {
+                    return board[row][col];
+                }
+    
+                // Check vertical (down)
+                if (row <= 2 && board[row][col] != 0 &&
+                    board[row][col] == board[row + 1][col] &&
+                    board[row][col] == board[row + 2][col] &&
+                    board[row][col] == board[row + 3][col]) {
+                    return board[row][col];
+                }
+    
+                // Check diagonal (bottom-left to top-right)
+                if (row <= 2 && col <= 3 && board[row][col] != 0 &&
+                    board[row][col] == board[row + 1][col + 1] &&
+                    board[row][col] == board[row + 2][col + 2] &&
+                    board[row][col] == board[row + 3][col + 3]) {
+                    return board[row][col];
+                }
+    
+                // Check diagonal (top-left to bottom-right)
+                if (row >= 3 && col <= 3 && board[row][col] != 0 &&
+                    board[row][col] == board[row - 1][col + 1] &&
+                    board[row][col] == board[row - 2][col + 2] &&
+                    board[row][col] == board[row - 3][col + 3]) {
+                    return board[row][col];
                 }
             }
         }
-        return isDraw ? 3 : 0;  // Return 3 for draw, 0 for no winner
-    }
-
+    
+        // If no winners and no empty spaces, it's a draw
+        return hasEmpty ? 0 : 3;
+    }  
     // Make a move on the board for a given player (1 or 2)
     private static boolean makeMove(int[][] board, int col, int player) {
         for (int row = 5; row >= 0; row--) {
