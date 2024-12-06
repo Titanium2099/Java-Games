@@ -1,6 +1,6 @@
 package org.example;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -236,16 +236,26 @@ public class Minimax_C4_Algorithm {
     // Find the best move for the AI (Player 2)
     public static int findBestMove(int[][] board) {
         ForkJoinPool pool = ForkJoinPool.commonPool();
-        MoveEvaluationTask[] tasks = new MoveEvaluationTask[7];
+        List<MoveEvaluationTask> taskList = new ArrayList<>();
 
         for (int col = 0; col < 7; col++) {
-            if (board[0][col] == 0) {  // If the column is not full
-                tasks[col] = new MoveEvaluationTask(board, col);
+            if (board[0][col] == 0) {  // Only create tasks for playable columns
+                taskList.add(new MoveEvaluationTask(board, col));
             }
         }
 
+        //fallback
+        if (taskList.isEmpty()) {
+            for (int col = 0; col < 7; col++) {
+                if (board[0][col] == 0) {
+                    return col;
+                }
+            }
+            return -1;
+        }        
+
         try {
-            List<Future<MoveEvaluation>> results = pool.invokeAll(Arrays.asList(tasks));
+            List<Future<MoveEvaluation>> results = pool.invokeAll(taskList);
             int bestScore = Integer.MIN_VALUE;
             int bestMove = -1;
 
