@@ -12,65 +12,72 @@ public class Minimax_C4_Algorithm {
     // Evaluate the board state. Returns a score based on how favorable the board is for Player 2 (AI).
     private static int evaluateBoard(int[][] board) {
         int score = 0;
-        
-        // Horizontal, Vertical and Diagonal checks for scoring
+    
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 7; col++) {
-                if (board[row][col] == 1) {
-                    score -= evaluateDirection(board, row, col, 1);  // Player 1's chips hurt the score
-                } else if (board[row][col] == 2) {
-                    score += evaluateDirection(board, row, col, 2);  // Player 2's chips help the score
+                if (board[row][col] == 2) {
+                    // AI chip (Player 2)
+                    score += evaluatePosition(board, row, col, 2);
+                } else if (board[row][col] == 1) {
+                    // Opponent chip (Player 1)
+                    score -= evaluatePosition(board, row, col, 1);
                 }
             }
         }
-        return score;
-    }
-
-    // Helper method to evaluate each direction (horizontal, vertical, diagonal)
-    private static int evaluateDirection(int[][] board, int row, int col, int player) {
-        int score = 0;
-        
-        // Horizontal check
-        score += evaluateLine(board, row, col, 0, 1, player);  // Right direction
-        // Vertical check
-        score += evaluateLine(board, row, col, 1, 0, player);  // Down direction
-        // Diagonal (bottom-left to top-right)
-        score += evaluateLine(board, row, col, 1, 1, player);  // Down-right direction
-        // Diagonal (top-left to bottom-right)
-        score += evaluateLine(board, row, col, 1, -1, player);  // Down-left direction
-        
-        return score;
-    }
-
-    // Evaluate a line of 4 cells in a direction (used for horizontal, vertical, diagonal scoring)
-    private static int evaluateLine(int[][] board, int row, int col, int dRow, int dCol, int player) {
-        int count = 0;
     
-        // Vertical-specific condition: ensure all rows below the evaluated line are filled
-        if (dRow == 1 && dCol == 0) {
-            for (int i = 0; i < 4; i++) {
-                int r = row + i * dRow;
-                if (r >= 6 || board[r][col] != player) {
-                    return 0;  // Blocked, incomplete, or invalid vertical line
-                }
-            }
-        } else {
-            // General case for horizontal and diagonal checks
-            for (int i = 0; i < 4; i++) {
-                int r = row + i * dRow;
-                int c = col + i * dCol;
-    
-                if (r < 0 || r >= 6 || c < 0 || c >= 7 || (board[r][c] != 0 && board[r][c] != player)) {
-                    return 0;  // Invalid line
-                }
-                if (board[r][c] == player) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return score;
     }    
-
+    private static int evaluatePosition(int[][] board, int row, int col, int player) {
+        int score = 0;
+    
+        int centralColumnBonus = (7 - Math.abs(3 - col)); // More weight to column 3
+        score += centralColumnBonus;
+    
+        score += scoreDirection(board, row, col, 0, 1, player);  // Horizontal
+        score += scoreDirection(board, row, col, 1, 0, player);  // Vertical
+        score += scoreDirection(board, row, col, 1, 1, player);  // Diagonal
+        score += scoreDirection(board, row, col, 1, -1, player); // Anti-diagonal
+    
+        return score;
+    }    
+    private static int scoreDirection(int[][] board, int row, int col, int dRow, int dCol, int player) {
+        int consecutive = 0;
+        int empty = 0;
+        int block = 0;
+    
+        for (int i = 0; i < 4; i++) {
+            int r = row + i * dRow;
+            int c = col + i * dCol;
+    
+            // Out of bounds
+            if (r < 0 || r >= 6 || c < 0 || c >= 7) {
+                block++;
+                break;
+            }
+    
+            if (board[r][c] == player) {
+                consecutive++;
+            } else if (board[r][c] == 0) {
+                empty++;
+            } else {
+                block++;
+                break;
+            }
+        }
+    
+        if (block > 0 && consecutive == 0) {
+            return 0; // Line is blocked and not useful
+        }
+    
+        // Score based on consecutive chips and potential
+        switch (consecutive) {
+            case 4: return 1000;  // Win
+            case 3: return empty > 0 ? 50 : 0;  // Three-in-a-row with space to complete
+            case 2: return empty > 1 ? 10 : 0;  // Two-in-a-row with at least two spaces
+            case 1: return empty > 2 ? 1 : 0;   // Single chip with enough room to expand
+            default: return 0;
+        }
+    }
     // Check if a player has won
     private static int checkWinner(int[][] board) {
         boolean hasEmpty = false;
@@ -119,7 +126,7 @@ public class Minimax_C4_Algorithm {
     
         // If no winners and no empty spaces, it's a draw
         return hasEmpty ? 0 : 3;
-    }  
+    }    
     // Make a move on the board for a given player (1 or 2)
     private static boolean makeMove(int[][] board, int col, int player) {
         for (int row = 5; row >= 0; row--) {
@@ -146,6 +153,7 @@ public class Minimax_C4_Algorithm {
         int winner = checkWinner(board);
         if (winner != 0) {
             if (winner == 1) {
+                //System.out.println("AI DEBUG: DETECTING PLAYER 1 WIN");
                 return -1000;  // Player 1 wins (bad for AI)
             } else if (winner == 2) {
                 return 1000;  // Player 2 wins (good for AI)
@@ -214,6 +222,7 @@ public class Minimax_C4_Algorithm {
             if (makeMove(board, column, 2)) {
                 int score = minimax(board, MaxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
                 undoMove(board, column);
+                System.out.println("AI DEBUG: Column " + column + " Score: " + score);
                 return new MoveEvaluation(column, score);
             }
             return new MoveEvaluation(column, Integer.MIN_VALUE);
@@ -258,9 +267,12 @@ public class Minimax_C4_Algorithm {
 
             for (Future<MoveEvaluation> result : results) {
                 MoveEvaluation eval = result.get();
+                System.out.println("AI DEBUG: Column " + eval.column + " Score: " + eval.score + " Best: " + bestScore + " Move: " + bestMove);
                 if (eval.score > bestScore) {
                     bestScore = eval.score;
                     bestMove = eval.column;
+                }else if (eval.score == bestScore){
+                    ////
                 }
             }
             return bestMove;
