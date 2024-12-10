@@ -174,7 +174,7 @@ public class Connect4 extends VBox {
             
             currentChip = -100;
             currentPlayer = currentPlayer == 1 ? 2 : 1;
-            status.setText(currentPlayer == 1 ? "Player 1's turn" : "Player 2's turn");
+            status.setText(currentPlayer == 1 ? "Player 1's turn" : (gameMode == 0 ? "Player 2's turn" : "AI's turn"));
             overrideLeaveColumn = true;
             int winner = checkWinner();
             if (winner == 1) {
@@ -331,17 +331,9 @@ public class Connect4 extends VBox {
     
     private void AI_communicator() {
         // Get the best column from the Minimax algorithm for AI (Player 2)
-        int bestColumn = -100;
-        try{
-            bestColumn = Minimax_C4_Algorithm.findBestMove(board);
-        }catch(Exception e){
-            TPopup("The AI hit an error! (this means that you probably outplayed the AI and it couldn't find a move)", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-            System.err.println("AI hit an error: ");
-            System.err.println(e);
-            e.printStackTrace();
-            return;
-        }
-        if(bestColumn == -100) return;
+        int bestMove[] = Minimax_C4_Algorithm.findBestMove(board);
+        //returns [row, col]
+        int bestColumn = bestMove[1];
         // Find the first empty row in that column
         int rowToPlace = -1;
         for (int row = 5; row >= 0; row--) {
@@ -387,6 +379,9 @@ public class Connect4 extends VBox {
         } else if (winner == 3) {
             addConfetti();
             TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+        }else{
+            //manually trigger the hover effect (if the mouse hasn't moved)
+            //rowHover(columnVBox);
         }
     }
     
