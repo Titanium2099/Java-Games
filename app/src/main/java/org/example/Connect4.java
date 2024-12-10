@@ -25,6 +25,8 @@ public class Connect4 extends VBox {
 
     private StyledText status;
     List<FadeTransition> fadeTransitions;
+
+    private List<int[]> winningChips = new ArrayList<>();
     /*
      * gameModes are as follows:
      * 0: Player vs Player
@@ -40,7 +42,7 @@ public class Connect4 extends VBox {
         }else if(gameMode == 2){
             Minimax_C4_Algorithm.MaxDepth = 5;
         }else if(gameMode == 3){
-            Minimax_C4_Algorithm.MaxDepth = 10;
+            Minimax_C4_Algorithm.MaxDepth = 6;
         }
             
         //draw the connect 4 board
@@ -176,17 +178,7 @@ public class Connect4 extends VBox {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
             status.setText(currentPlayer == 1 ? "Player 1's turn" : (gameMode == 0 ? "Player 2's turn" : "AI's turn"));
             overrideLeaveColumn = true;
-            int winner = checkWinner();
-            if (winner == 1) {
-                addConfetti();
-                TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-            } else if (winner == 2) {
-                addConfetti();
-                TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-            } else if (winner == 3) {
-                addConfetti();
-                TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-            }
+            winHandler(checkWinner());
 
             if(gameMode != 0 && currentPlayer == 2) {
                 AI_communicator();
@@ -229,12 +221,15 @@ public class Connect4 extends VBox {
         }
     }
     private int checkWinner() {
+        winningChips.clear();
+    
         // Check horizontal win
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 4; col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row][col + 1] 
+                if (board[row][col] != 0 && board[row][col] == board[row][col + 1]
                     && board[row][col] == board[row][col + 2] && board[row][col] == board[row][col + 3]) {
-                    return board[row][col];  // Return the player number (1 or 2)
+                    for (int i = 0; i < 4; i++) winningChips.add(new int[] {row, col + i});
+                    return board[row][col];
                 }
             }
         }
@@ -244,7 +239,8 @@ public class Connect4 extends VBox {
             for (int row = 0; row < 3; row++) {
                 if (board[row][col] != 0 && board[row][col] == board[row + 1][col]
                     && board[row][col] == board[row + 2][col] && board[row][col] == board[row + 3][col]) {
-                    return board[row][col];  // Return the player number (1 or 2)
+                    for (int i = 0; i < 4; i++) winningChips.add(new int[] {row + i, col});
+                    return board[row][col];
                 }
             }
         }
@@ -254,7 +250,8 @@ public class Connect4 extends VBox {
             for (int col = 0; col < 4; col++) {
                 if (board[row][col] != 0 && board[row][col] == board[row + 1][col + 1]
                     && board[row][col] == board[row + 2][col + 2] && board[row][col] == board[row + 3][col + 3]) {
-                    return board[row][col];  // Return the player number (1 or 2)
+                    for (int i = 0; i < 4; i++) winningChips.add(new int[] {row + i, col + i});
+                    return board[row][col];
                 }
             }
         }
@@ -264,7 +261,8 @@ public class Connect4 extends VBox {
             for (int col = 3; col < 7; col++) {
                 if (board[row][col] != 0 && board[row][col] == board[row + 1][col - 1]
                     && board[row][col] == board[row + 2][col - 2] && board[row][col] == board[row + 3][col - 3]) {
-                    return board[row][col];  // Return the player number (1 or 2)
+                    for (int i = 0; i < 4; i++) winningChips.add(new int[] {row + i, col - i});
+                    return board[row][col];
                 }
             }
         }
@@ -281,7 +279,45 @@ public class Connect4 extends VBox {
         }
         return isDraw ? 3 : 0;  // Return 3 for draw, 0 for no winner
     }    
-
+    private void winHandler(int winner) {
+        if (winner > 0) {
+            for (int i = 0; i < winningChips.size(); i++) {
+                int[] coords = winningChips.get(i);
+                int row = coords[0];
+                int col = coords[1];
+    
+                VBox columnVBox = (VBox) ((HBox) getChildren().get(1)).getChildren().get(col);
+                Circle winningCircle = (Circle) columnVBox.getChildren().get(row);
+    
+                // Delay the start of each animation
+                PauseTransition delay = new PauseTransition(Duration.seconds(0.2 * i));
+                delay.setOnFinished(e -> {
+                    FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.8), winningCircle);
+                    fadeTransition.setFromValue(1.0);
+                    fadeTransition.setToValue(0.3);
+                    fadeTransition.setCycleCount(FadeTransition.INDEFINITE);
+                    fadeTransition.setAutoReverse(true);
+                    fadeTransition.play();
+                });
+                delay.play();
+            }
+    
+            // Show winner popup after a delay
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.2 * winningChips.size() + 0.5));
+            pause.setOnFinished(e -> {
+                addConfetti();
+                if (winner == 1) {
+                    TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+                } else if (winner == 2) {
+                    TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+                } else {
+                    TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
+                }
+            });
+            pause.play();
+        }
+    }
+    
     private void addConfetti() {
         //load image "confetti.gif" and display it on the screen using javafx.scene.image.ImageView
         Image confettiImage = new Image(getClass().getResourceAsStream("/images/confetti.gif"));
@@ -369,20 +405,10 @@ public class Connect4 extends VBox {
         status.setText("Player 1's turn");
     
         // Check if the AI's move resulted in a win
-        int winner = checkWinner();
-        if(winner == 1){
-            addConfetti();
-            TPopup("Player 1 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-        } if (winner == 2) {
-            addConfetti();
-            TPopup("Player 2 wins!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-        } else if (winner == 3) {
-            addConfetti();
-            TPopup("It's a draw!", "Main Menu", () -> App.scene.setRoot(App.mainMenuC4));
-        }else{
-            //manually trigger the hover effect (if the mouse hasn't moved)
-            //rowHover(columnVBox);
-        }
+        winHandler(checkWinner());
+        //manually trigger the hover effect (if the mouse hasn't moved)
+        //rowHover(columnVBox);
+        
     }
     
 }
